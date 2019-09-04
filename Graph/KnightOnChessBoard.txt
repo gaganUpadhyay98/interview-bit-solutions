@@ -1,0 +1,80 @@
+/*
+Knight movement on a chess board
+
+Given any source point and destination point on a chess board, we need to find whether Knight can move to the destination or not.
+
+Knight's movements on a chess board
+
+The above figure details the movements for a knight ( 8 possibilities ). Note that a knight cannot go out of the board.
+
+If yes, then what would be the minimum number of steps for the knight to move to the said point.
+If knight can not move from the source point to the destination point, then return -1
+
+Input:
+
+N, M, x1, y1, x2, y2
+where N and M are size of chess board
+x1, y1  coordinates of source point
+x2, y2  coordinates of destination point
+Output:
+
+return Minimum moves or -1
+Example
+
+Input : 8 8 1 1 8 8
+Output :  6
+*/
+
+//Since we have to find the minimum number of steps hence here we would be using BFS.
+//Each point has 3 componants , it's x and y co-ordinates and the total distance travelled
+//from the starting point to reach this point.Hence we make a special class for this purpose.
+int r[] = {-2, -1, 1, 2, -2, -1, 1, 2}; 
+int c[] = {-1, -2, -2, -1, 1, 2, 2, 1};
+class point
+{
+    public:
+    int x; //x-cordinate
+    int y; //y-cordinate
+    int distance;  //distance from the starting point till the current point
+    point(int i,int j,int k)
+    {
+        x=i;
+        y=j;
+        distance=k;
+    }
+};
+bool isSafe(int i,int j,int n,int m)
+{
+    return i>=1&&j>=1&&i<=n&&j<=m; //checks if the position where we want to go is legal or not
+}
+int Solution::knight(int n, int m, int x1, int y1, int x2, int y2) 
+{
+    queue<point> q;
+    point p(x1,y1,0); //initial point to be inserted in the queue 
+    q.push(p);
+    int visited[n+1][m+1];
+    memset(visited,0,sizeof(visited));
+    visited[x1][y1]=1; //mark the starting point as visited as we have already inserted in the queue
+    //perform BFS
+    while(q.empty()!=true)
+    {
+        point temp=q.front();
+        q.pop();
+        if(temp.x==x2&&temp.y==y2) //reached the desired point 
+        {
+            return temp.distance; //return the total distance travelled till this point
+        }
+        for(int i=0;i<8;i++) //go to all the next points possible 
+        {
+            int nx=temp.x+r[i];
+            int ny=temp.y+c[i];
+            if(isSafe(nx,ny,n,m)&&visited[nx][ny]==0) //if the point hs not been visited before and is legal , then we insert such point in the queue
+            {
+                visited[nx][ny]=1; //mark this visited so that it is not inserted again
+                point t(nx,ny,temp.distance+1); //as this point 1 unit away from current point hence we do "temp.distance+1"
+                q.push(t);
+            }
+        }
+    }
+    return -1; //can't reach this point from the start using moves of knight.
+}

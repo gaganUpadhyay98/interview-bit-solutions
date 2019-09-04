@@ -1,0 +1,80 @@
+/*
+There are n islands and there are many bridges connecting them. Each bridge has some cost attached to it.
+
+We need to find bridges with minimal cost such that all islands are connected.
+
+It is guaranteed that input data will contain at least one possible scenario in which all islands are connected with each other.
+
+Example :
+Input
+
+         Number of islands ( n ) = 4
+         1 2 1 
+         2 3 4
+         1 4 3
+         4 3 2
+         1 3 10
+In this example, we have number of islands(n) = 4 . Each row then represents a bridge configuration. In each row first two numbers represent the islands number which are connected by this bridge and the third integer is the cost associated with this bridge.
+
+In the above example, we can select bridges 1(connecting islands 1 and 2 with cost 1), 3(connecting islands 1 and 4 with cost 3), 4(connecting islands 4 and 3 with cost 2). Thus we will have all islands connected with the minimum possible cost(1+3+2 = 6). 
+In any other case, cost incurred will be more.
+*/
+
+//We will do it using Kruskal Algorithm
+//https://www.hackerearth.com/practice/algorithms/graphs/minimum-spanning-tree/tutorial/
+//refer to the above link for more clarification
+class bridge
+{
+    public:
+    int u;
+    int v;
+    int cost;
+};
+bool comp(bridge a,bridge b)
+{
+    return a.cost<b.cost;
+}
+int getRootParent(int i,int parent[]) //gives the unique id of a componant
+{
+    if(i==parent[i])
+    {
+        return i;
+    }
+    return getRootParent(parent[i],parent);
+}
+void union_set(int u,int v,int parent[]) //unification if 2 componants into 1 
+{
+    parent[u]=parent[v]; //u rooted graph merges with v rooted graph
+}
+int Solution::solve(int n, vector<vector<int> > &B) 
+{
+    vector<bridge> inp;
+    bridge b;
+    for(int i=0;i<B.size();i++)
+    {
+        b.u=B[i][0];
+        b.v=B[i][1];
+        b.cost=B[i][2];
+        inp.push_back(b);
+    }
+    sort(inp.begin(),inp.end(),comp); //sort acc to weights
+    int parent[n+1];
+    for(int i=0;i<=n;i++)
+    {
+        parent[i]=i; //initially no one is connected , all unique within themselves
+    }
+    int ans=0;
+    int count=0;
+    for(int i=0;i<inp.size();i++) //this woud choose n-1 required edges
+    {
+        int rootParentU=getRootParent(inp[i].u,parent); //get id of graph in which this lie
+        int rootParentV=getRootParent(inp[i].v,parent); //get id of graph in which this lie
+        if(rootParentV!=rootParentU) //both in different , no cyce formation -> merge
+        {
+            ans+=inp[i].cost;
+            //make the parent of root of any one same as that of other , to indicae unification
+            union_set(rootParentU,rootParentV,parent);  
+        }
+    }
+    return ans;
+}

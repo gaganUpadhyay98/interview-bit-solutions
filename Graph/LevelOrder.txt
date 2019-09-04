@@ -1,0 +1,71 @@
+/*
+Given a binary tree, return the level order traversal of its nodes’ values. (ie, from left to right, level by level).
+
+Example :
+Given binary tree
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+return its level order traversal as:
+
+[
+  [3],
+  [9,20],
+  [15,7]
+]
+Also think about a version of the question where you are asked to do a level order traversal of the tree when depth of the tree is much greater than number of nodes on a level.
+*/
+
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+
+//We would use a queue , enter the root in the queue while starting and also a NULL pointer
+//NULL indicates end of a Level, whenever we pop-out a non-NULL node
+//check for its left and right siblings , if present add them in the Queue
+vector<vector<int> > Solution::levelOrder(TreeNode* A) 
+{
+    queue<TreeNode*> q;
+    q.push(A);
+    q.push(NULL); //insert NULL to indicate END of level
+    vector<vector<int> > result;
+    vector<int> temp;
+    while(q.empty()!=true)
+    {
+        TreeNode* f=q.front();
+        q.pop();
+        if(f==NULL) //reached end of a level
+        {
+            result.push_back(temp);
+            temp.clear();
+            if(q.empty()!=true) //some lements left to explore,push NULL to indicate end of level
+            {
+                q.push(NULL); 
+            }
+        }
+        else
+        {
+            temp.push_back(f->val);
+            //At a non-empty node , check for left and right siblings
+            if(f->left)
+            {
+                q.push(f->left);
+            }
+            if(f->right)
+            {
+                q.push(f->right);
+            }
+        }
+    }
+    return result;
+}

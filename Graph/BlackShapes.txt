@@ -1,0 +1,74 @@
+/*
+Given N * M field of O's and X's, where O=white, X=black
+Return the number of black shapes. A black shape consists of one or more adjacent X's (diagonals not included)
+
+Example:
+
+OOOXOOO
+OOXXOXO
+OXOOOXO
+
+answer is 3 shapes are  :
+(i)    X
+     X X
+(ii)
+      X
+ (iii)
+      X
+      X
+Note that we are looking for connected shapes here.
+
+For example,
+
+XXX
+XXX
+XXX
+is just one single connected black shape.
+*/
+
+//Use the concept of DFS to find the number of connected componants
+//Whenever we find an unvisited black componant , increment to count of shapes
+//and run DFS from this position marking all the adjacent black spots.
+int r[]={0,1,-1,0};
+int c[]={1,0,0,-1};
+bool isSafe(int i,int j,int n,int m)
+{
+    return i>=0&&i<n&&j>=0&&j<m;
+}
+void dfs(vector<string> &A,int i,int j,vector<vector<int> >& visited,int n,int m)
+{
+    visited[i][j]=1;
+    for(int k=0;k<4;k++) //go in every possible direction
+    {
+        int nx=i+r[k];
+        int ny=j+c[k];
+        if(isSafe(nx,ny,n,m)&&visited[nx][ny]==0&&A[nx][ny]=='X')
+        {
+            dfs(A,nx,ny,visited,n,m);
+        }
+    }
+}
+int Solution::black(vector<string> &A) 
+{
+    int n=A.size();
+    int m=A[0].length();
+    int ans=0;
+    vector<vector<int> > visited;
+    for(int i=0;i<n;i++)
+    {
+        vector<int> temp(m,0);
+        visited.push_back(temp);
+    }
+    for(int i=0;i<n;i++)
+    {
+        for(int j=0;j<m;j++)
+        {
+            if(A[i][j]=='X'&&visited[i][j]==0) //perform DFS now and mark all the black points of this componant
+            {
+                ans++;
+                dfs(A,i,j,visited,n,m);
+            }
+        }
+    }
+    return ans;
+}

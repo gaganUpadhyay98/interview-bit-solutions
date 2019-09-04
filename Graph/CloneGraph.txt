@@ -1,0 +1,48 @@
+/*
+Clone an undirected graph. Each node in the graph contains a label and a list of its neighbors.
+*/
+
+/**
+ * Definition for undirected graph.
+ * struct UndirectedGraphNode {
+ *     int label;
+ *     vector<UndirectedGraphNode *> neighbors;
+ *     UndirectedGraphNode(int x) : label(x) {};
+ * };
+ */
+ 
+//It is bit similar to the cloning of a linked list with random pointers.
+//We would be doing BFS and while doing BFS we would make copy of the existing node .
+//Key in the map represents the node of graph given to us while value correspinds to the new cloned node.
+//In the queue we always push the node of the graph given to us , not the cloned node as we have to traverse
+//the whole graph which is given to us.
+UndirectedGraphNode *Solution::cloneGraph(UndirectedGraphNode *node) {
+    //myMap[i] indicates copy of node i
+    queue<UndirectedGraphNode*> q;
+    UndirectedGraphNode* temp=new UndirectedGraphNode(node->label);
+    unordered_map<UndirectedGraphNode*,UndirectedGraphNode*> myMap;
+    //temp s the new cloned node , while "node" is the node of original graph given to us.
+    myMap[node]=temp;
+    q.push(node);
+    //in the queue we push nodes of original graph
+    //as we have to traverse the neighbours of original graph itself
+    while(q.empty()!=true)
+    {
+        UndirectedGraphNode* f=q.front(); //this is original not duplicate
+        q.pop();
+        vector<UndirectedGraphNode*> n=f->neighbors;
+        //traverse the neighbours of the current node 
+        for(int i=0;i<n.size();i++)
+        {
+            if(myMap[n[i]]==NULL) //this node is not visited ,make a copy of it and push it in the queue 
+            {
+               myMap[n[i]]=new UndirectedGraphNode(n[i]->label); //cloning
+               q.push(n[i]); //pushing in the queue
+            }
+            //since n[i] is the neighbour of "f" , hence clone of n[i] is also neighbour of clone of "f".
+            //therefore push the cloned "n[i]" , int he neighbour vector of cloned "f".
+            myMap[f]->neighbors.push_back(myMap[n[i]]);
+        }
+    }
+    return myMap[node]; //cloned starting point is returned
+}

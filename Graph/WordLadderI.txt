@@ -1,0 +1,75 @@
+/*
+Given two words (start and end), and a dictionary, find the length of shortest transformation sequence from start to end, such that:
+
+You must change exactly one character in every transformation
+Each intermediate word must exist in the dictionary
+Example :
+
+Given:
+
+start = "hit"
+end = "cog"
+dict = ["hot","dot","dog","lot","log"]
+As one shortest transformation is "hit" -> "hot" -> "dot" -> "dog" -> "cog",
+return its length 5.
+
+Note that we account for the length of the transformation path instead of the number of transformation itself.
+
+ Note:
+Return 0 if there is no such transformation sequence.
+All words have the same length.
+All words contain only lowercase alphabetic characters.
+*/
+
+//Here again see "shortest" is written , this gives us a bit of hint that here BFS shll be used.
+//We will make a queue of pairs , each pair having the word and the corresponding number of transformations
+//needed to reach that word . Imagine forming the chain of words from start to end , changing only one letter
+//at a time and each of the intermediate word (except start and end) shall be in the dictionary.
+bool isadjacent(string& a, string& b) //tells whether 2 strings exactly differ by 1 letter or nor
+{ 
+    int count = 0;  // to store count of differences 
+    int n = a.length(); 
+    for (int i = 0; i < n; i++) 
+    { 
+        if (a[i] != b[i]) count++; 
+        if (count > 1) return false; 
+    } 
+    return count == 1 ? true : false; //if exactly same count=0 , not adjacent return false
+} 
+int shortestChainLen(string& start, string& target, set<string> &D) 
+{ 
+    // Create a queue for BFS and insert 'start' as source vertex 
+    queue<pair<string,int> > Q; 
+    Q.push({start, 1}); // Chain length for start word is 1 
+    pair<string,int> item;
+    while (!Q.empty()) 
+    { 
+        pair<string,int> curr = Q.front(); 
+        Q.pop(); 
+        
+        if(curr.first==target)
+        {
+            return curr.second; //i.e no of words formed in between including both start and end
+        }
+        for (auto it:D) //for all the words present in the dictionary
+        { 
+            if (isadjacent(curr.first, it)) //this word in dictionary differs only by 1 letter 
+            { 
+                item.first = it; 
+                item.second = curr.second + 1; //include this word in the chain formed
+                Q.push(item); 
+                D.erase(it); //this same word can't be used again , hence remove this from dictionary
+            } 
+        } 
+    } 
+    return 0; 
+} 
+int Solution::ladderLength(string start, string end, vector<string> &dictV) {
+    set<string> s;
+    for(int i=0;i<dictV.size();i++)
+    {
+        s.insert(dictV[i]);
+    }
+    //make a set of dictionary so that we can easily delete a word from the dictionary once it is used.
+    return shortestChainLen(start,end,s);
+}

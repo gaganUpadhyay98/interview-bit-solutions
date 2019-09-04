@@ -1,0 +1,85 @@
+/*
+Find largest distance
+Given an arbitrary unweighted rooted tree which consists of N (2 <= N <= 40000) nodes. The goal of the problem is to find largest distance between two nodes in a tree. Distance between two nodes is a number of edges on a path between the nodes (there will be a unique path between any pair of nodes since it is a tree). The nodes will be numbered 0 through N - 1.
+
+The tree is given as an array P, there is an edge between nodes P[i] and i (0 <= i < N). Exactly one of the i’s will have P[i] equal to -1, it will be root node.
+
+ Example:
+If given P is [-1, 0, 0, 0, 3], then node 0 is the root and the whole tree looks like this: 
+          0
+       /  |  \
+      1   2   3
+               \
+                4  
+ One of the longest path is 1 -> 0 -> 3 -> 4 and its length is 3, thus the answer is 3. Note that there are other paths with maximal distance. 
+ */
+//Imagine this tree as an Undirected Graph.
+//We will do BFS 2 times , one to get as far as possible from the root
+//other to go as far as possible from this oint reached in earlier bfs
+class graph
+{
+    public:
+    unordered_map<int,vector<int> > adjList;
+    void addEdge(int u,int v)
+    {
+        adjList[u].push_back(v);
+        adjList[v].push_back(u);
+    }
+};
+pair<int,int> bfs(graph g,int root,int n)
+{
+    vector<int> distance(n,-1);
+    queue<int> q;
+    q.push(root);
+    distance[root]=0;
+    //we can also maintain a queue of pairs where
+    //1->node 
+    //2->distance from starting point
+    while(q.empty()!=true)
+    {
+        int f=q.front();
+        q.pop();
+        for(int i=0;i<g.adjList[f].size();i++)
+        {
+            int neighbour=g.adjList[f][i];
+            if(distance[neighbour]==-1)
+            {
+                distance[neighbour]=1+distance[f];
+                q.push(neighbour);
+            }
+        }
+    }
+    int maxDis=INT_MIN;
+    pair<int,int> p;
+    //find the maximum distance pair
+    for(int i=0;i<n;i++)
+    {
+        if(distance[i]>maxDis)
+        {
+            p.first=i;
+            p.second=distance[i];
+            maxDis=distance[i];
+        }
+    }
+    return p;
+}
+int Solution::solve(vector<int> &A) 
+{
+    graph g;
+    int root=-1;
+    for(int i=0;i<A.size();i++)
+    {
+        if(A[i]==-1)
+        {
+            root=i;
+        }
+        else
+        {
+            g.addEdge(A[i],i);
+        }
+    }
+    pair<int,int> a=bfs(g,root,A.size()); //perform bfs from root
+    pair<int,int> b=bfs(g,a.first,A.size()); //perfrom bfs from the farthestpoint from root
+    //b.first contains the node which is farthes from a(a is the node farthest from root)
+    return b.second;
+}

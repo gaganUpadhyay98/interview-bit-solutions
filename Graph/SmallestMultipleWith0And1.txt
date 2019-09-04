@@ -1,0 +1,54 @@
+/*
+You are given an integer N. You have to find smallest multiple of N which consists of digits 0 and 1 only. Since this multiple could be large, return it in form of a string.
+
+Note:
+
+Returned string should not contain leading zeroes.
+For example,
+
+For N = 55, 110 is smallest multiple consisting of digits 0 and 1.
+For N = 2, 10 is the answer.
+*/
+
+//We would perform BFS , initially starting with 1.
+//whenever we pop a element we check its remainder with the given number 
+//as the number could be large we store it as a string and use a seperate function to calculate remainder
+//Each time we get a remainder , we check whether this remainder is already visited , if yes , then no need to explore this present string further
+//as the older string which gave us this remainder is shorter than the current string
+//Hence exploring that string would give is a smaller answer as that string which have occured before would be smaller
+//than the current string being explored.
+int rem(string num,int n) //calculate remainder of large number given as string
+{
+    int res=0;
+    for(int i=0;i<num.length();i++)
+    {
+        res=res*10+(num[i]-'0');
+        res=res%n;
+    }
+    return res;
+}
+string Solution::multiple(int n) 
+{
+    queue<string> q;
+    q.push("1");
+    set<int> visited; //stores the already visited remainders
+    //for each reminder we only want to explore the min length string corresponding to it
+    //and not add any other string with the same reminder
+    while(q.empty()!=true)
+    {
+        string f=q.front();
+        q.pop();
+        int r=rem(f,n);
+        if(r==0)
+        {
+            return f;
+        }
+        if(visited.find(r)==visited.end())//remainder not visited before
+        {
+            q.push(f+"0");
+            q.push(f+"1");
+            visited.insert(r);
+        }
+    }
+}
+//Note - This is not MOST-OPTIMAL solution and passes partially

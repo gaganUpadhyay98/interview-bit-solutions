@@ -1,0 +1,94 @@
+/*
+Given a 2D board containing 'X' and 'O', capture all regions surrounded by 'X'.
+
+A region is captured by flipping all 'O's into 'X's in that surrounded region.
+
+For example,
+
+X X X X
+X O O X
+X X O X
+X O X X
+After running your function, the board should be:
+
+X X X X
+X X X X
+X X X X
+X O X X
+*/
+
+//It is a bit advanced version of DFS
+//Only those regions have to be converted which are totally surrounded by 'X'
+//Now if a 'O' is at the one of the open corners i.e first/last row/col , then it not completely
+//surrounded by 'X' hence it would not be converted , moreover all the 'O' connected to this 'O' at
+//first/last row/col would also not be converted to X
+//Hence for each 'O' at open end , we run a dfs from that position
+//marking all the 'O's connected with it , In the end 'O's which are not marked
+//are converted to 'X'.
+int r[]={0,-1,0,1};
+int c[]={1,0,-1,0};
+bool isSafe(int i,int j,int x,int y)
+{
+    return i>=0&&j>=0&&i<x&&j<y;
+}
+void dfs(vector<vector<char> > &A,int x,int y,vector<vector<int> >& visited,int n,int m)
+{
+    visited[x][y]=1;
+    for(int i=0;i<4;i++)
+    {
+        int nx=x+r[i];
+        int ny=y+c[i];
+        if(isSafe(nx,ny,n,m)&&visited[nx][ny]==0&&A[nx][ny]=='O')
+        {
+            dfs(A,nx,ny,visited,n,m);
+        }
+    }
+}
+void Solution::solve(vector<vector<char> > &A) {
+    // Do not write main() function.
+    // Do not read input, instead use the arguments to the function.
+    // Do not print the output, instead return values as specified
+    // Still have a doubt. Checkout www.interviewbit.com/pages/sample_codes/ for more details
+    int n=A.size();
+    int m=A[0].size();
+    vector<vector<int> > visited;
+    for(int i=0;i<n;i++)
+    {
+        vector<int> temp(m,0);
+        visited.push_back(temp);
+    }
+    //1st and last row
+    for(int i=0;i<m;i++)
+    {
+        if(A[0][i]=='O'&&visited[0][i]==0)
+        {
+            dfs(A,0,i,visited,n,m); //run dfs
+        }
+        if(A[n-1][i]=='O'&&visited[n-1][i]==0)
+        {
+            dfs(A,n-1,i,visited,n,m); //run dfs
+        }
+    }
+    //1st and last col
+    for(int i=0;i<n;i++)
+    {
+        if(A[i][0]=='O'&&visited[i][0]==0)
+        {
+            dfs(A,i,0,visited,n,m); //run dfs
+        }
+        if(A[i][m-1]=='O'&&visited[i][m-1]==0)
+        {
+            dfs(A,i,m-1,visited,n,m); //run dfs
+        }
+    }
+    for(int i=0;i<n;i++)
+    {
+        for(int j=0;j<m;j++)
+        {
+            if(A[i][j]=='O'&&visited[i][j]==0) //convert unmarked 'O's to 'X'
+            {
+                A[i][j]='X';
+            }
+        }
+    }
+}

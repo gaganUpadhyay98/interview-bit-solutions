@@ -1,0 +1,42 @@
+/*
+How many minimum numbers from fibonacci series are required such that sum of numbers should be equal to a given Number N?
+Note : repetition of number is allowed.
+
+Example:
+
+N = 4
+Fibonacci numbers : 1 1 2 3 5 .... so on
+here 2 + 2 = 4 
+so minimum numbers will be 2 
+*/
+
+//Here we would use greedy approach , it always works there is a theorem regarding this can't recall name
+//will update soon on finding.So we would generate all fib numbers less than the given number
+//and choose the maximum possible "feasible" fib number maximum times and increment count whenever we use
+//a fib number .Each time we use a fib no we decrease the value of number to be formed now.
+int Solution::fibsum(int n) 
+{
+    vector<unsigned long long> fib;
+    fib.push_back(1);
+    fib.push_back(1);
+    for(int i=2;fib[i-1]<n;i++) //generate all fib number less than n
+    {
+        fib.push_back(fib[i-1]+fib[i-2]);
+    }
+    int sum=n;
+    int count=0;
+    int j=fib.size()-1;
+    while(sum>0)
+    {
+        //use greedy approach , use the largest number possible as many times as you can
+        while(j>=0&&fib[j]>sum)
+        {
+            j--; //dont consider useless numbers.
+        }
+        sum=sum-fib[j]; 
+        //use this number , after using subtract from the number as now we have
+        //to make this updated number
+        count++;
+    }
+    return count;
+}
